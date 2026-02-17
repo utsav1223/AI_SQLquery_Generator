@@ -1,5 +1,6 @@
-import { useEffect, useContext } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function OAuthSuccess() {
@@ -9,24 +10,16 @@ export default function OAuthSuccess() {
 
   useEffect(() => {
     const token = params.get("token");
+    const userParam = params.get("user");
 
-    if (!token) {
-      return navigate("/login");
+    if (token && userParam) {
+      const user = JSON.parse(decodeURIComponent(userParam));
+
+      login({ token, user });
+
+      navigate("/dashboard");
     }
-
-    // Decode token to extract user info
-    const payload = JSON.parse(atob(token.split(".")[1]));
-
-    const user = {
-      id: payload.userId,
-      role: payload.role
-    };
-
-    login({ token, user });
-
-    navigate("/dashboard");
   }, []);
 
-  return <div>Logging you in...</div>;
+  return <p>Logging in...</p>;
 }
-

@@ -1,31 +1,3 @@
-// const mongoose = require('mongoose')
-
-// const userSchema = new mongoose.Schema(
-//     {
-//         name : {type: String, required: true, trim: true},
-//         email : {type: String, required: true, unique: true, lowercase: true, trim: true},
-//         password : {type: String, default: null},
-//         googleID : {type: String, default:null},
-//         role : {type: String, enum:["admin","user"],default:"user"},
-//         isVerified : {type: Boolean, default:false},
-//         lastLogin : {type:Date},
-
-//     },
-//     {timestamps:true}
-// )
-// const User = new mongoose.model("User",userSchema)
-// export default User;
-
-
-
-
-
-
-
-
-
-
-
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -35,32 +7,63 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true
     },
+
     password: {
       type: String,
       default: null
     },
+
     googleId: {
       type: String,
       default: null
     },
+
     role: {
       type: String,
       enum: ["admin", "user"],
       default: "user"
     },
-    resetPasswordToken: {
-      type: String
+
+    // 🔹 PLAN SYSTEM
+    plan: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free"
     },
 
-    resetPasswordExpire: {
-      type: Date
+    credits: {
+      type: Number,
+      default: 20 // free users get 20 daily
+    },
+
+    billingRenewal: {
+      type: Date,
+      default: null
+    },
+
+    teamSize: {
+      type: Number,
+      default: 1
+    },
+
+    // 🔹 PASSWORD RESET
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+
+    resetOTP: String,
+    resetOTPExpire: Date,
+    resetOTPAttempts: {
+      type: Number,
+      default: 0
     }
+
   },
   { timestamps: true }
 );

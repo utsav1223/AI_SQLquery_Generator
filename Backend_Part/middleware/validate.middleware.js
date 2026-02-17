@@ -1,3 +1,5 @@
+// middleware to throw the error or success....
+
 const { validationResult } = require("express-validator");
 
 module.exports = (req, res, next) => {
