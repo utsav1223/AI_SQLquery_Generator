@@ -7,63 +7,54 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true
     },
-
     password: {
       type: String,
       default: null
     },
-
     googleId: {
       type: String,
       default: null
     },
-
     role: {
       type: String,
       enum: ["admin", "user"],
       default: "user"
     },
-
-    // 🔹 PLAN SYSTEM
     plan: {
       type: String,
       enum: ["free", "pro"],
       default: "free"
     },
-
-    credits: {
+    dailyUsage: {
       type: Number,
-      default: 20 // free users get 20 daily
+      default: 0
     },
-
+    usageDate: {
+      type: Date,
+      default: Date.now
+    },
     billingRenewal: {
       type: Date,
       default: null
     },
-
     teamSize: {
       type: Number,
       default: 1
     },
-
-    // 🔹 PASSWORD RESET
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-
     resetOTP: String,
     resetOTPExpire: Date,
     resetOTPAttempts: {
       type: Number,
       default: 0
     }
-
   },
   { timestamps: true }
 );

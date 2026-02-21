@@ -1,25 +1,47 @@
-import { useEffect } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function OAuthSuccess() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [error, setError] = useState("");
+
+  const token = useMemo(() => params.get("token"), [params]);
+  const userParam = useMemo(() => params.get("user"), [params]);
 
   useEffect(() => {
-    const token = params.get("token");
-    const userParam = params.get("user");
+    const completeOAuthLogin = async () => {
+      if (!token) {
+        setError("Missing OAuth token");
+        setTimeout(() => navigate("/login", { replace: true }), 1200);
+        return;
+      }
 
-    if (token && userParam) {
-      const user = JSON.parse(decodeURIComponent(userParam));
+      try {
+        let user = null;
+        if (userParam) {
+          user = JSON.parse(decodeURIComponent(userParam));
+        }
 
-      login({ token, user });
+        await login({ token, user });
+        navigate("/dashboard", { replace: true });
+      } catch (err) {
+        console.error("OAuth login failed:", err);
+        setError("OAuth login failed");
+        setTimeout(() => navigate("/login", { replace: true }), 1200);
+      }
+    };
 
-      navigate("/dashboard");
-    }
-  }, []);
+    completeOAuthLogin();
+  }, [login, navigate, token, userParam]);
 
-  return <p>Logging in...</p>;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-700">
+      <p className="text-sm font-bold tracking-wide">
+        {error || "Logging in..."}
+      </p>
+    </div>
+  );
 }

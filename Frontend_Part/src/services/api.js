@@ -20,8 +20,14 @@ export const apiRequest = async (endpoint, method = "GET", body = null) => {
   const data = await response.json();
 
   if (!response.ok) {
-    // throw new Error(data.message || "Something went wrong");
-    throw data;
+    const error = new Error(data.message || "Something went wrong");
+
+    // attach backend response
+    error.code = data.code;
+    error.status = response.status;
+    error.data = data;
+
+    throw error;
   }
 
   return data;

@@ -1,23 +1,3 @@
-// exports.requirePro = (req, res, next) => {
-//   if (req.user.plan !== "pro") {
-//     return res.status(403).json({
-//       message: "This feature is available for Pro users only."
-//     });
-//   }
-//   next();
-// };
-
-
-
-
-
-
-
-
-
-
-
-
 const User = require("../models/User");
 
 exports.requirePro = async (req, res, next) => {
@@ -34,9 +14,9 @@ exports.requirePro = async (req, res, next) => {
       });
     }
 
-    next();
+    return next();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Plan verification failed" });
+    return res.status(500).json({ message: "Plan verification failed" });
   }
 };

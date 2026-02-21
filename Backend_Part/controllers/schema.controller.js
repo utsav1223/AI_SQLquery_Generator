@@ -3,15 +3,38 @@ const SchemaModel = require("../models/Schema");
 // 🔹 Save or Update Schema
 exports.saveSchema = async (req, res) => {
   try {
-    const { schemaText } = req.body;
+    const { schemaText, clear } = req.body;
+    const clearQuery = req.query?.clear;
+    const shouldClear =
+      clear === true ||
+      clear === "true" ||
+      clear === 1 ||
+      clear === "1" ||
+      clearQuery === "true" ||
+      clearQuery === "1";
 
-    if (!schemaText || !schemaText.trim()) {
+    if (shouldClear) {
+      const deleteResult = await SchemaModel.deleteOne({
+        userId: req.user.userId
+      });
+
+      return res.json({
+        message: "Schema cleared successfully",
+        lastUpdated: null,
+        size: 0,
+        deletedCount: deleteResult.deletedCount || 0
+      });
+    }
+
+    const normalizedSchema = (schemaText || "").trim();
+
+    if (!normalizedSchema) {
       return res.status(400).json({
         message: "Schema cannot be empty"
       });
     }
 
-    if (schemaText.length > 20000) {
+    if (normalizedSchema.length > 20000) {
       return res.status(400).json({
         message: "Schema exceeds maximum size (20KB)"
       });
@@ -19,7 +42,7 @@ exports.saveSchema = async (req, res) => {
 
     const schema = await SchemaModel.findOneAndUpdate(
       { userId: req.user.userId },
-      { schemaText },
+      { schemaText: normalizedSchema },
       { new: true, upsert: true }
     );
 
@@ -61,6 +84,25 @@ exports.getSchema = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch schema"
+    });
+  }
+};
+
+// 🔹 Delete Schema
+exports.deleteSchema = async (req, res) => {
+  try {
+    const deleteResult = await SchemaModel.deleteOne({
+      userId: req.user.userId
+    });
+
+    res.json({
+      message: "Schema deleted successfully",
+      deletedCount: deleteResult.deletedCount || 0
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete schema"
     });
   }
 };
